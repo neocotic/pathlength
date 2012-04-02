@@ -150,11 +150,11 @@ function format(event, data) {
     case 'x':
     case 'xml':
       switch (event) {
-        case 'afterStart':
+        case 'start':
           return '<?xml version="1.0" encoding="UTF-8" ?>'
             .concat('\n')
-            .concat('<results>')
-            .concat('\n');
+            .concat('<results>');
+        case 'afterStart':
         case 'betweenData':
           return '\n';
         case 'data':
@@ -163,7 +163,7 @@ function format(event, data) {
               , data.length
               , data.directory ? 'Directory' : 'File');
         case 'beforeEnd':
-          return '\n'
+          return (data.length ? '\n' : '')
             .concat('</results>');
         case 'end':
           return program.progressive ? '' : formatAll(data);
