@@ -1,5 +1,5 @@
 {   "name": "pathlength"
-  , "description": "File path length checker"
+  , "description": "File path length checker for node"
   , "version": "1.0.0"
   , "homepage": "http://neocotic.com/pathlength"
   , "bugs": { "url": "https://github.com/neocotic/pathlength/issues" }
