@@ -15,13 +15,13 @@ var program = require('commander')
 program
   .version(pathlength.version)
   .usage('[options] [target]')
-  .option('-d --debug', 'output debug messages')
-  .option('-f --filter [expression]', 'filter expression to use')
-  .option('-h --headers', 'output headers for certain formats')
-  .option('-o --output [format]', 'format for output', 'simple')
-  .option('-p --progressive', 'output matches as they are found')
-  .option('-r --recursive', 'check directories recursively')
-  .option('-s --stop', 'don\'t search unfiltered directories')
+  .option('-d, --debug', 'output debug messages')
+  .option('-f, --filter [expression]', 'filter expression to use')
+  .option('-n, --no-headers', 'don\'t output headers for certain formats')
+  .option('-o, --output [format]', 'format for output', 'simple')
+  .option('-p, --progressive', 'output matches as they are found')
+  .option('-r, --recursive', 'check directories recursively')
+  .option('-s, --stop', 'don\'t search unfiltered directories')
   .parse(process.argv);
 
 if (program.debug) {
@@ -36,7 +36,9 @@ if (program.debug) {
   console.log('');
 }
 
-/** Result formatting. */
+/**
+ * Table formatting.
+ */
 
 var columns = [
     {   cell: function(data) {
@@ -59,7 +61,9 @@ var columns = [
     }
 ];
 
-// Calculate maximum column lengths (based on headers only) for padding.
+// If headers are enabled, the maximum width for each column needs to be
+// calculated for padding later. This is not done in progressive mode as we're
+// not able to predetermine the maximum column widths for subsequent rows.
 if (program.headers && !program.progressive) {
   columns.forEach(function(col) {
     col.padding = col.header.length;
@@ -67,11 +71,20 @@ if (program.headers && !program.progressive) {
 }
 
 /**
+ * Format the given `data` based on the `event` fired.
  * 
+ * If `event` is **end** and progressive mode is enabled, no other events will
+ * actually be triggered as `formatAll` will be used to simulate each one.
+ * 
+ * @param {String} event
+ * @param {Array|Object} [data]
+ * @return {String} formatted string
+ * @api private
  */
 
 function format(event, data) {
   switch (program.output.toLowerCase()) {
+    // Comma-separated values
     case 'c':
     case 'csv':
       switch (event) {
@@ -88,6 +101,7 @@ function format(event, data) {
           return '';
       }
       break;
+    // JSON
     case 'j':
     case 'json':
       switch (event) {
@@ -101,17 +115,18 @@ function format(event, data) {
           }, null, 2);
         case 'end':
           if (program.progressive) return '';
-          return JSON.stringify(data.map(function(result) {
+          return JSON.stringify(data.map(function(row) {
             return {
-                path: data.path
-              , length: data.length
-              , type: data.directory ? 'Directory' : 'File'
+                path: row.path
+              , length: row.length
+              , type: row.directory ? 'Directory' : 'File'
             };
           }), null, 2);
         default:
           return '';
       }
       break;
+    // Table
     case 't':
     case 'table':
       var buf = '';
@@ -135,7 +150,7 @@ function format(event, data) {
           return buf;
         case 'end':
           if (program.progressive) return '';
-          // Calculate maximum column lengths (based on cells only) for padding
+          // Calculate maximum width for each column in this row for padding.
           data.forEach(function(row) {
             columns.forEach(function(col) {
               var len = col.cell(row).length;
@@ -147,6 +162,7 @@ function format(event, data) {
           return '';
       }
       break;
+    // XML
     case 'x':
     case 'xml':
       switch (event) {
@@ -154,8 +170,7 @@ function format(event, data) {
           return '<?xml version="1.0" encoding="UTF-8" ?>'
             .concat('\n')
             .concat('<results>');
-        case 'afterStart':
-        case 'betweenData':
+        case 'beforeData':
           return '\n';
         case 'data':
           return util.format('  <result path=%j length="%d" type="%s" />'
@@ -171,6 +186,7 @@ function format(event, data) {
           return '';
       }
       break;
+    // Simple (default)
     case 's':
     case 'simple':
     default:
@@ -186,6 +202,15 @@ function format(event, data) {
       }
   }
 }
+
+/**
+ * Format all data within `dataSet` by programmatically calling `format`,
+ * simulating all necessary events.
+ * 
+ * @param {Array} dataSet
+ * @return {String} formatted string
+ * @api private
+ */
 
 function formatAll(dataSet) {
   var buf = format('start')
@@ -205,7 +230,7 @@ function formatAll(dataSet) {
  * 
  * @param {String} str
  * @param {Number} width
- * @return {String}
+ * @return {String} padding string
  * @api private
  */
 
@@ -213,24 +238,37 @@ function pad(str, width) {
   return str.concat(Array(Math.max(0, width - str.length) + 1).join(' '));
 }
 
-/** Event management. */
+/**
+ * Output formatted data when events are fired.
+ * 
+ * @param {Object} e
+ * @param {String} e.type
+ * @param {Array|Object} [data]
+ * @api private
+ */
 
 function eventHandler(e, data) {
   process.stdout.write(format(e.type, data));
 }
 
-(program.progressive
+/**
+ * Event management.
+ */
+
+'end '.concat(program.progressive
   ? 'start afterStart betweenData beforeData data afterData beforeEnd'
-  : 'end')
+  : '')
     .split(' ')
     .forEach(function(event) {
       pathlength.on(event, eventHandler);
     });
 
-/** Processing. */
+/**
+ * Processing.
+ */
 
 pathlength.debug = !!program.debug;
-pathlength.find({
+pathlength.filter({
     filter: program.filter
   , recursive: !!program.recursive
   , stop: !!program.stop
