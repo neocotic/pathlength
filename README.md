@@ -15,7 +15,7 @@
 Install from [npm][]:
 
 ``` bash
-$ npm install -g pathlength
+$ npm install pathlength
 ```
 
 ## Usage Examples
