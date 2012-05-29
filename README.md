@@ -18,7 +18,23 @@ Install from [npm][]:
 $ npm install pathlength
 ```
 
-## Usage Examples
+## Usage
+
+    Usage: pathlength [options] [target]
+
+    Options:
+
+      -h, --help                 output usage information
+      -V, --version              output the version number
+      -d, --debug                output debug messages
+      -f, --filter [expression]  filter expression to use
+      -n, --no-headers           don't output headers for certain formats
+      -o, --output [format]      format for output
+      -p, --progressive          output matches as they are found
+      -r, --recursive            check directories recursively
+      -s, --stop                 don't search unfiltered directories
+
+### Examples
 
 Recursively check for all files within a `Temp` directory with a path longer
 than 255 characters:
@@ -54,29 +70,21 @@ Output the results of the search as they are found:
 $ pathlength -rpf ">@" ~/Temp
 ```
 
-## Usage
-
-    Usage: pathlength [options] [target]
-
-    Options:
-
-      -h, --help                 output usage information
-      -V, --version              output the version number
-      -d, --debug                output debug messages
-      -f, --filter [expression]  filter expression to use
-      -n, --no-headers           don't output headers for certain formats
-      -o, --output [format]      format for output
-      -p, --progressive          output matches as they are found
-      -r, --recursive            check directories recursively
-      -s, --stop                 don't search unfiltered directories
-
-### Formats
+## Formats
 
 ``` bash
 $ pathlength -o $FORMAT ~/Temp
 ```
 
-#### Comma-separated values
+### Simple (default)
+
+Names: `simple` `s`
+
+Example:
+
+    /Users/neocotic/Temp:20
+
+### Comma-separated values
 
 Names: `csv` `c`
 
@@ -84,23 +92,23 @@ Example:
 
     "/Users/neocotic/Temp","20","Directory"
 
-#### JSON
+### JSON
 
 Names: `json` `j`
 
 Example:
 
 ``` javascript
-  [
-    {
-      "path": "/Users/neocotic/Temp",
-      "length": 20,
-      "type": "Directory"
-    }
-  ]
+[
+  {
+    "path": "/Users/neocotic/Temp",
+    "length": 20,
+    "type": "Directory"
+  }
+]
 ```
 
-#### Table
+### Table
 
 Names: `table` `t`
 
@@ -114,7 +122,7 @@ Example:
     Path                 Length Type
     /Users/neocotic/Temp 20     Directory
 
-#### XML
+### XML
 
 Names: `xml` `x`
 
@@ -127,20 +135,12 @@ Example:
 </results>
 ```
 
-#### Simple (default)
-
-Names: `simple` `s`
-
-Example:
-
-    /Users/neocotic/Temp:20
-
-### Programmatically
+## Programmatically
 
 `find([options][, callback])` is used primarily:
 
 ``` javascript
-var pathlength = require('pathlength');
+var pathlength = require('pathlength')
 
 pathlength.find({
         filter: ['lte', '255']
@@ -148,12 +148,12 @@ pathlength.find({
       , target: '~/Temp'
     }
   , function(err, dataSet) {
-      if (err) throw err;
+      if (err) throw err
       // Process data set...
-    });
+    })
 ```
 
-#### Options
+### Options
 
 The following options are recognised by this method (all of which are
 optional);
@@ -185,22 +185,22 @@ optional);
   </tr>
 </table>
 
-#### Events
+### Events
 
 Get notified whenever a matching file/directory has been found:
 
 ``` javascript
-var pathlength = require('pathlength');
+var pathlength = require('pathlength')
 
 pathlength.on('data', function(e, data) {
-  console.log('Event: %j', e.type); // Event: "data"
+  console.log('Event: %j', e.type) // Event: "data"
   // Process data...
-});
+})
 pathlength.find({
     filter: 'gt @'
   , recursive: true
   , target: '~/Temp'
-});
+})
 ```
 
 The following events can be triggered by this method;
@@ -244,17 +244,17 @@ The following events can be triggered by this method;
   </tr>
 </table>
 
-#### Properties
+### Properties
 
 ``` javascript
 pathlength.on('end', function(e, dataSet) {
   dataSet.forEach(function(data) {
-    console.log(data.path); // e.g. /Users/neocotic/Temp
-    console.log(data.length); // e.g. 20
-    console.log(data.directory); // e.g. true
-    console.log('');
-  });
-});
+    console.log(data.path)      // e.g. /Users/neocotic/Temp
+    console.log(data.length)    // e.g. 20
+    console.log(data.directory) // e.g. true
+    console.log('')
+  })
+})
 ```
 
 ## Filters
