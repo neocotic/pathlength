@@ -348,7 +348,7 @@ visit the project's homepage;
 
 http://neocotic.com/pathlength
 
-[@neocotic]: https://twitter.com/#!/neocotic
+[@neocotic]: https://twitter.com/neocotic
 [node.js]: http://nodejs.org
 [npm]: http://npmjs.org
 [pathlength]: http://neocotic.com/pathlength

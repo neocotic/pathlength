@@ -1,8 +1,6 @@
-# Project generated files #
-node_modules
+node_modules/
 npm-debug.log
 
-# OS generated files #
 .DS_Store
 ehthumbs.db
 Icon?
