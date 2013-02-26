@@ -10,7 +10,9 @@
 
 [pathlength][] is a simple file path length checker for [node.js][].
 
-## Installation
+[![Build Status](https://secure.travis-ci.org/neocotic/pathlength.png)](http://travis-ci.org/neocotic/pathlength)
+
+## Install
 
 Install from [npm][]:
 
