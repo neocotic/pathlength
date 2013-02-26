@@ -8,7 +8,7 @@
        \ \_\                                                /\____/             
         \/_/                                                \_/__/              
 
-[pathlength][] is a simple file path length checker for [Node.js][].
+[pathlength][] is a simple file path length checker for [node.js][].
 
 ## Installation
 
@@ -142,15 +142,17 @@ Example:
 ``` javascript
 var pathlength = require('pathlength')
 
-pathlength.find({
-        filter: ['lte', '255']
+pathlength.find(
+    {
+        filter:    ['lte', '255']
       , recursive: true
-      , target: '~/Temp'
+      , target:    '~/Temp'
     }
-  , function(err, dataSet) {
+  , function (err, dataSet) {
       if (err) throw err
       // Process data set...
-    })
+    }
+)
 ```
 
 ### Options
@@ -192,14 +194,13 @@ Get notified whenever a matching file/directory has been found:
 ``` javascript
 var pathlength = require('pathlength')
 
-pathlength.on('data', function(e, data) {
-  console.log('Event: %j', e.type) // Event: "data"
+pathlength.on('data', function (data) {
   // Process data...
 })
 pathlength.find({
-    filter: 'gt @'
+    filter:    'gt @'
   , recursive: true
-  , target: '~/Temp'
+  , target:    '~/Temp'
 })
 ```
 
@@ -247,12 +248,11 @@ The following events can be triggered by this method;
 ### Properties
 
 ``` javascript
-pathlength.on('end', function(e, dataSet) {
-  dataSet.forEach(function(data) {
+pathlength.on('end', function (dataSet) {
+  dataSet.forEach(function (data) {
     console.log(data.path)      // e.g. /Users/neocotic/Temp
     console.log(data.length)    // e.g. 20
     console.log(data.directory) // e.g. true
-    console.log('')
   })
 })
 ```
@@ -331,20 +331,19 @@ characters, which are replaced with their corresponding value:
 
 ## Bugs
 
-If you have any problems with this library or would like to see the changes
-currently in development you can do so here;
+If you have any problems with this library or would like to see the changes currently in
+development you can do so here;
 
 https://github.com/neocotic/pathlength/issues
 
 ## Questions?
 
-Take a look at `docs/index.html` to get a better understanding of what the code
-is doing.
+Take a look at `docs/pathlength.html` to get a better understanding of what the code is doing.
 
 If that doesn't help, feel free to follow me on Twitter, [@neocotic][].
 
-However, if you want more information or examples of using this library please
-visit the project's homepage;
+However, if you want more information or examples of using this library please visit the project's
+homepage;
 
 http://neocotic.com/pathlength
 

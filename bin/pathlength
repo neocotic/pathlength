@@ -1,59 +1,66 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
+// [pathlength](http://neocotic.com/pathlength) 0.1.0  
+// Copyright (c) 2013 Alasdair Mercer  
+// Freely distributable under the MIT license.  
+// For all details and documentation:  
+// <http://neocotic.com/pathlength>
 
-var program = require('commander')
-  , util = require('util')
-  , pathlength = require('../');
+'use strict';
 
-/**
- * Option parsing.
- */
+// Module dependencies
+// -------------------
+
+var pathlength = require('../lib/pathlength')
+  , program    = require('commander')
+  , util       = require('util');
+
+// Option parsing
+// --------------
 
 program
   .version(pathlength.version)
   .usage('[options] [target]')
-  .option('-d, --debug', 'output debug messages')
+  .option('-d, --debug',               'output debug messages')
   .option('-f, --filter [expression]', 'filter expression to use')
-  .option('-n, --no-headers', 'don\'t output headers for certain formats')
-  .option('-o, --output [format]', 'format for output', 'simple')
-  .option('-p, --progressive', 'output matches as they are found')
-  .option('-r, --recursive', 'check directories recursively')
-  .option('-s, --stop', 'don\'t search unfiltered directories')
+  .option('-n, --no-headers',          'don\'t output headers for certain formats')
+  .option('-o, --output [format]',     'format for output', 'simple')
+  .option('-p, --progressive',         'output matches as they are found')
+  .option('-r, --recursive',           'check directories recursively')
+  .option('-s, --stop',                'don\'t search unfiltered directories')
   .parse(process.argv);
 
 if (program.debug) {
-  console.log('args: %j', program.args);
-  console.log('debug: %j', program.debug);
-  console.log('filter: %j', program.filter);
-  console.log('headers: %j', program.headers);
-  console.log('output: %j', program.output);
+  console.log('args: %j',        program.args);
+  console.log('debug: %j',       program.debug);
+  console.log('filter: %s',      program.filter);
+  console.log('headers: %j',     program.headers);
+  console.log('output: %j',      program.output);
   console.log('progressive: %j', program.progressive);
-  console.log('recursive: %j', program.recursive);
-  console.log('stop: %j', program.stop);
-  console.log('');
+  console.log('recursive: %j',   program.recursive);
+  console.log('stop: %j\n',      program.stop);
 }
 
-/**
- * Table formatting.
- */
+// Table formatting
+// ----------------
 
 var columns = [
-    {   cell: function(data) {
+    {
+        cell: function(data) {
           return data.path;
         }
       , header: 'Path'
       , padding: 0
     }
-  , {   cell: function(data) {
+  , {
+        cell: function(data) {
           return String(data.length);
         }
       , header: 'Length'
       , padding: 0
     }
-  , {   cell: function(data) {
+  , {
+        cell: function(data) {
           return data.directory ? 'Directory' : 'File';
         }
       , header: 'Type'
@@ -61,28 +68,26 @@ var columns = [
     }
 ];
 
-// If headers are enabled, the maximum width for each column needs to be
-// calculated for padding later. This is not done in progressive mode as we're
-// not able to predetermine the maximum column widths for subsequent rows.
+// If headers are enabled, the maximum width for each column needs to be calculated for padding
+// later. This is not done in progressive mode as we're not able to predetermine the maximum column
+// widths for subsequent rows.
 if (program.headers && !program.progressive) {
-  columns.forEach(function(col) {
+  columns.forEach(function (col) {
     col.padding = col.header.length;
   });
 }
 
-/**
- * Format the given `data` based on the `event` fired.
- * 
- * If `event` is **end** and progressive mode is enabled, no other events will
- * actually be triggered as `formatAll` will be used to simulate each one.
- * 
- * @param {String} event
- * @param {Array|Object} [data]
- * @return {String} formatted string
- * @api private
- */
+// Pad `str` to `width`.
+function pad(str, width) {
+  return str.concat(new Array(Math.max(0, width - str.length) + 1).join(' '));
+}
 
-function format(event, data) {
+var format, formatAll;
+
+// Format the given `data` based on the `event` fired.  
+// If `event` is **end** and progressive mode is enabled, no other events will actually be
+// triggered as `formatAll` will be used to simulate each one.
+format = function(event, data) {
   switch (program.output.toLowerCase()) {
     // Comma-separated values
     case 'c':
@@ -91,10 +96,8 @@ function format(event, data) {
         case 'betweenData':
           return '\n';
         case 'data':
-          return util.format('"%s","%d","%s"'
-              , data.path
-              , data.length
-              , data.directory ? 'Directory' : 'File');
+          return util.format('"%s","%d","%s"', data.path, data.length,
+            data.directory ? 'Directory' : 'File');
         case 'end':
           return program.progressive ? '' : formatAll(data);
         default:
@@ -109,17 +112,17 @@ function format(event, data) {
           return '\n';
         case 'data':
           return JSON.stringify({
-              path: data.path
+              path:   data.path
             , length: data.length
-            , type: data.directory ? 'Directory' : 'File'
+            , type:   data.directory ? 'Directory' : 'File'
           }, null, 2);
         case 'end':
           if (program.progressive) return '';
-          return JSON.stringify(data.map(function(row) {
+          return JSON.stringify(data.map(function (row) {
             return {
-                path: row.path
+                path:   row.path
               , length: row.length
-              , type: row.directory ? 'Directory' : 'File'
+              , type:   row.directory ? 'Directory' : 'File'
             };
           }), null, 2);
         default:
@@ -133,28 +136,28 @@ function format(event, data) {
       switch (event) {
         case 'afterStart':
           if (!program.headers) return '';
-          columns.forEach(function(col) {
-            buf = buf.concat(col.padding
-              ? pad(col.header, col.padding + 1)
-              : col.header.concat('\t'));
+          columns.forEach(function (col) {
+            buf = buf.concat(col.padding ? pad(col.header, col.padding + 1) :
+              col.header.concat('\t'));
           });
           return buf.concat('\n');
         case 'betweenData':
           return '\n';
         case 'data':
-          columns.forEach(function(col) {
-            buf = buf.concat(col.padding
-              ? pad(col.cell(data), col.padding + 1)
-              : col.cell(data).concat('\t'));
+          columns.forEach(function (col) {
+            buf = buf.concat(col.padding ? pad(col.cell(data), col.padding + 1) :
+              col.cell(data).concat('\t'));
           });
           return buf;
         case 'end':
           if (program.progressive) return '';
           // Calculate maximum width for each column in this row for padding.
-          data.forEach(function(row) {
-            columns.forEach(function(col) {
+          data.forEach(function (row) {
+            columns.forEach(function (col) {
               var len = col.cell(row).length;
-              if (len > col.padding) col.padding = len;
+              if (len > col.padding) {
+                col.padding = len;
+              }
             });
           });
           return formatAll(data);
@@ -167,19 +170,14 @@ function format(event, data) {
     case 'xml':
       switch (event) {
         case 'start':
-          return '<?xml version="1.0" encoding="UTF-8" ?>'
-            .concat('\n')
-            .concat('<results>');
+          return '<?xml version="1.0" encoding="UTF-8" ?>\n<results>';
         case 'beforeData':
           return '\n';
         case 'data':
-          return util.format('  <result path=%j length="%d" type="%s" />'
-              , data.path
-              , data.length
-              , data.directory ? 'Directory' : 'File');
+          return util.format('  <result path=%j length="%d" type="%s" />', data.path, data.length,
+            data.directory ? 'Directory' : 'File');
         case 'beforeEnd':
-          return (data.length ? '\n' : '')
-            .concat('</results>');
+          return (data.length ? '\n' : '').concat('</results>');
         case 'end':
           return program.progressive ? '' : formatAll(data);
         default:
@@ -189,7 +187,6 @@ function format(event, data) {
     // Simple (default)
     case 's':
     case 'simple':
-    default:
       switch (event) {
         case 'betweenData':
           return '\n';
@@ -200,77 +197,58 @@ function format(event, data) {
         default:
           return '';
       }
+      break;
+    default:
+      pathlength.emit('error', util.format('Invalid format: %s', program.output));
   }
-}
+};
 
-/**
- * Format all data within `dataSet` by programmatically calling `format`,
- * simulating all necessary events.
- * 
- * @param {Array} dataSet
- * @return {String} formatted string
- * @api private
- */
-
-function formatAll(dataSet) {
-  var buf = format('start')
-    .concat(dataSet.length ? format('afterStart') : '');
-  dataSet.forEach(function(data, i) {
-    buf = buf
-      .concat(i ? format('betweenData') : '')
+// Format all data within `dataSet` by programmatically calling `format`, simulating all necessary
+// events.
+formatAll = function(dataSet) {
+  var buf = format('start').concat(dataSet.length ? format('afterStart') : '');
+  dataSet.forEach(function (data, i) {
+    buf = buf.concat(i ? format('betweenData') : '')
       .concat(format('beforeData', data))
-      .concat(format('data', data))
-      .concat(format('afterData', data));
+      .concat(format('data',       data))
+      .concat(format('afterData',  data));
   });
   return buf.concat(format('beforeEnd', dataSet));
-}
+};
 
-/**
- * Pad `str` to `width`.
- * 
- * @param {String} str
- * @param {Number} width
- * @return {String} padding string
- * @api private
- */
+// Event management
+// ----------------
 
-function pad(str, width) {
-  return str.concat(Array(Math.max(0, width - str.length) + 1).join(' '));
-}
+[
+    'start'
+  , 'afterStart'
+  , 'betweenData'
+  , 'beforeData'
+  , 'data'
+  , 'afterData'
+  , 'beforeEnd'
+  , 'end'
+].slice(program.progressive ? 0 : -1).forEach(function (event) {
+  pathlength.on(event, function (data) {
+    var output = format(event, data);
+    if (event === 'end') {
+      output += '\n';
+    }
+    process.stdout.write(output);
+  });
+});
 
-/**
- * Output formatted data when events are fired.
- * 
- * @param {Object} e
- * @param {String} e.type
- * @param {Array|Object} [data]
- * @api private
- */
+pathlength.on('error', function (err) {
+  process.stderr.write(err);
+});
 
-function eventHandler(e, data) {
-  process.stdout.write(format(e.type, data));
-}
-
-/**
- * Event management.
- */
-
-'end '.concat(program.progressive
-  ? 'start afterStart betweenData beforeData data afterData beforeEnd'
-  : '')
-    .split(' ')
-    .forEach(function(event) {
-      pathlength.on(event, eventHandler);
-    });
-
-/**
- * Processing.
- */
+// Processing
+// ----------
 
 pathlength.debug = !!program.debug;
-pathlength.filter({
-    filter: program.filter
+pathlength.find({
+    filter:    program.filter
   , recursive: !!program.recursive
-  , stop: !!program.stop
-  , target: program.args[0]
+  , stop:      !!program.stop
+  , target:    program.args[0]
 });
