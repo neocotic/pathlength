@@ -1,5 +1,10 @@
+sudo: false
 language: node_js
 node_js:
-  - 0.8
+  - "4"
+  - "6"
+  - "8"
 before_script:
-  - npm install -g grunt-cli
+  - npm install -g npm@latest
+script:
+  - npm run ci
