@@ -4,14 +4,6 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
       pkg:      grunt.file.readJSON('package.json')
-    , docco:    {
-        all: {
-            options: {
-              output: 'docs'
-            }
-          , src:     ['lib/**/*.js']
-        }
-      }
     , jshint:   {
           all:     [
               'Gruntfile.js'
@@ -30,10 +22,8 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-docco');
 
-  grunt.registerTask('build',   ['docco']);
-  grunt.registerTask('default', ['test', 'build']);
+  grunt.registerTask('default', ['test']);
   grunt.registerTask('test',    ['jshint']);
 
 };

@@ -340,7 +340,7 @@ https://github.com/neocotic/pathlength/issues
 
 ## Questions?
 
-Take a look at `docs/pathlength.html` to get a better understanding of what the code is doing.
+Take a look at the code to get a better understanding of what it's doing.
 
 If that doesn't help, feel free to follow me on Twitter, [@neocotic][].
 
