@@ -2,31 +2,26 @@
   "name": "pathlength",
   "description": "File path length checker",
   "version": "0.1.0",
-  "homepage": "http://neocotic.com/pathlength",
+  "homepage": "https://github.com/neocotic/pathlength",
   "bugs": {
     "url": "https://github.com/neocotic/pathlength/issues"
   },
   "author": {
     "name": "Alasdair Mercer",
     "email": "mercer.alasdair@gmail.com",
-    "url": "http://neocotic.com"
+    "url": "https://neocotic.com"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/neocotic/pathlength.git"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/neocotic/pathlength/raw/master/LICENSE.md"
-    }
-  ],
+  "license": "MIT",
   "keywords": [
     "file",
     "path",
     "length",
     "util"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neocotic/pathlength.git"
+  },
   "dependencies": {
     "async": "~0.2.5",
     "commander": "~1.1.1",
@@ -38,11 +33,15 @@
     "grunt-contrib-watch": "~0.2.0",
     "grunt-docco": "~0.2.0"
   },
-  "scripts": {
-    "test": "grunt test"
-  },
-  "main": "lib/pathlength",
   "bin": {
     "pathlength": "bin/pathlength"
+  },
+  "main": "lib/pathlength",
+  "scripts": {
+    "ci": "npm run test",
+    "test": "grunt test"
+  },
+  "engines": {
+    "node": ">=4"
   }
 }
