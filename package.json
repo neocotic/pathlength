@@ -34,10 +34,10 @@
   "bin": {
     "pathlength": "bin/pathlength"
   },
-  "main": "lib/pathlength",
+  "main": "src/pathlength.js",
   "scripts": {
     "ci": "npm run test",
-    "test": "eslint \"lib/**/*.js\""
+    "test": "eslint \"src/**/*.js\" \"test/**/*.js\""
   },
   "engines": {
     "node": ">=4"

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-// [pathlength](http://neocotic.com/pathlength) 0.1.0  
-// Copyright (c) 2013 Alasdair Mercer  
-// Freely distributable under the MIT license.  
-// For all details and documentation:  
+// [pathlength](http://neocotic.com/pathlength) 0.1.0
+// Copyright (c) 2013 Alasdair Mercer
+// Freely distributable under the MIT license.
+// For all details and documentation:
 // <http://neocotic.com/pathlength>
 
 'use strict';
@@ -11,7 +11,7 @@
 // Module dependencies
 // -------------------
 
-var pathlength = require('../lib/pathlength')
+var pathlength = require('../src/pathlength')
   , program    = require('commander')
   , util       = require('util');
 
@@ -84,7 +84,7 @@ function pad(str, width) {
 
 var format, formatAll;
 
-// Format the given `data` based on the `event` fired.  
+// Format the given `data` based on the `event` fired.
 // If `event` is **end** and progressive mode is enabled, no other events will actually be
 // triggered as `formatAll` will be used to simulate each one.
 format = function(event, data) {
