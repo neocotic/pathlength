@@ -38,7 +38,9 @@ const _getRealPath = Symbol('getRealPath');
 const _hasReachedLimit = Symbol('hasReachedLimit');
 
 /**
- * TODO: Document
+ * Can check and report the length of paths for files and directories that are scanned.
+ *
+ * Optionally, the results can be filtered using an expression to report only paths whose length match.
  */
 class PathLength extends EventEmitter {
 
@@ -96,10 +98,32 @@ class PathLength extends EventEmitter {
   }
 
   /**
-   * TODO: Document
+   * Scans files and directories within the current working directory and checks the length of their real path using the
+   * <code>options</code> provided.
    *
-   * @param {PathLength~CheckOptions} [options] -
-   * @return {Promise.<Error, Array.<PathLength~Result>>}
+   * The <code>cwd</code> option can be used to control which directory is scanned initially. By default, this will be
+   * the current working directory.
+   *
+   * The <code>filter</code> option can be used to control which paths are included in the results based on their
+   * length. It can be a string expression (e.g. <code>"gte 20"</code>, <code>">= 20"</code>) or a {@link Filter}. If no
+   * <code>filter</code> option is specified, then all checked paths will be included in the results.
+   *
+   * The <code>force</code> option can be enabled to not fail when individual file checks throw errors (e.g. attempting
+   * to list files within a directory that the current user does not have access to). By default, such errors will
+   * result in the returned <code>Promise</code> being rejected.
+   *
+   * The <code>limit</code> option can be used to control the number of results that are returned before it stops
+   * checking. When negative, the number of results is unlimited, which is the default behavior.
+   *
+   * The <code>recursive</code> option can be enabled to recursively search all directories within the <code>cwd</code>
+   * and so on. By default, only files and directories located immediately within the <code>cwd</code> are checked.
+   * Symbolic links are never followed.
+   *
+   * This method returns a <code>Promise</code> that is resolved with all results. However, progress can be monitored by
+   * listening to events that are emitted by this {@link PathLength}.
+   *
+   * @param {PathLength~CheckOptions} [options] - the options to be used
+   * @return {Promise.<Error, Array.<PathLength~Result>>} A <code>Promise</code> for all of the results.
    * @fires PathLength#check
    * @fires PathLength#checkpath
    * @fires PathLength#end
@@ -128,11 +152,12 @@ class PathLength extends EventEmitter {
     debug.log('Checking path lengths using filter "%s" with options: %o', options.filter, options);
 
     /**
-     * TODO: Document
+     * The "check" event is fired once the options have been derived and the filter, if any, been parsed but before any
+     * paths are scanned and checked.
      *
      * @event PathLength#check
      * @type {Object}
-     * @property {PathLength~CheckOptions} options -
+     * @property {PathLength~CheckOptions} options - The options to be used.
      */
     this.emit('check', { options });
 
@@ -146,12 +171,12 @@ class PathLength extends EventEmitter {
         debug.log('Check completed with results: %o', results);
 
         /**
-         * TODO: Document
+         * The "end" event is fired once all paths have been scanned and checked.
          *
          * @event PathLength#end
          * @type {Object}
-         * @property {PathLength~CheckOptions} options -
-         * @property {PathLength~Result[]} results -
+         * @property {PathLength~CheckOptions} options - The options that were used.
+         * @property {PathLength~Result[]} results - The results of the checks.
          */
         this.emit('end', { options, results });
 
@@ -181,13 +206,14 @@ class PathLength extends EventEmitter {
     debug.log('Checking path "%s"', filePath);
 
     /**
-     * TODO: Document
+     * The "checkpath" event is fired immediately before a path is checked.
      *
      * @event PathLength#checkpath
      * @type {Object}
-     * @property {string} path -
+     * @property {PathLength~CheckOptions} options - The options to be used.
+     * @property {string} path - The path to be checked.
      */
-    this.emit('checkpath', { path: filePath });
+    this.emit('checkpath', { options, path: filePath });
 
     return PathLength[_getFileStats](filePath)
       .then((stats) => {
@@ -205,7 +231,7 @@ class PathLength extends EventEmitter {
           debug.log('Path found: %o', result);
 
           /**
-           * TODO: Document
+           * The "result" event is fired immediately after a path is checked along with its findings.
            *
            * @event PathLength#result
            * @type {PathLength~Result}
@@ -235,21 +261,26 @@ class PathLength extends EventEmitter {
 module.exports = PathLength;
 
 /**
- * TODO: Document
+ * The options that can be passed to {@link PathLength#check}.
  *
  * @typedef {Object} PathLength~CheckOptions
- * @property {string} [cwd] -
- * @property {Filter|string} [filter] -
- * @property {boolean} [force] -
- * @property {number} [limit=-1] -
- * @property {boolean} [recursive] -
+ * @property {string} [cwd] - The directory from which to begin scanning paths. This will be <code>process.cwd()</code>
+ * by default.
+ * @property {Filter|string} [filter] - The {@link Filter} (or filter expression to be parsed) to be used to control
+ * which paths are included in the results. All paths checked are included by default.
+ * @property {boolean} [force] - <code>true</code> to ignore errors for individual path checks; otherwise
+ * <code>false</code>. Disabled by default.
+ * @property {number} [limit=-1] - The maximum number of results. Unlimited if negative, which is the default.
+ * @property {boolean} [recursive] - <code>true</code> to search for paths recursively within <code>cwd</code>;
+ * otherwise <code>false</code>. Disabled by default.
  */
 
 /**
- * TODO: Document
+ * Contains the result of an individual path check.
  *
  * @typedef {Object} PathLength~Result
- * @property {boolean} directory -
- * @property {number} length -
- * @property {string} path -
+ * @property {boolean} directory - <code>true</code> if the path that was checked was a directory; otherwise
+ * <code>false</code>.
+ * @property {number} length - The length of the path.
+ * @property {string} path - The real path that was checked.
  */
