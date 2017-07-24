@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Copyright (C) 2017 Alasdair Mercer
  *
@@ -24,6 +22,4 @@
 
 'use strict';
 
-const cli = require('../src/cli');
-
-cli.parse(process.argv);
+module.exports = require('./api');

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Copyright (C) 2017 Alasdair Mercer
  *
@@ -24,6 +22,38 @@
 
 'use strict';
 
-const cli = require('../src/cli');
+const EOL = require('os').EOL;
 
-cli.parse(process.argv);
+const Style = require('./Style');
+
+/**
+ * TODO: Document
+ */
+class CsvStyle extends Style {
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  apply(options) {
+    const outputStream = options.outputStream;
+    const pathLength = options.pathLength;
+
+    pathLength.on('result', (event) => {
+      outputStream.write(`"${event.path}","${event.length}","${event.directory}"${EOL}`);
+    });
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  getName() {
+    return 'csv';
+  }
+
+}
+
+Style.register(CsvStyle);
+
+module.exports = CsvStyle;
