@@ -30,16 +30,23 @@ const _name = Symbol('name');
 const _operators = Symbol('operators');
 
 /**
- * TODO: Document
+ * Defines a logical operator which can be used to evaluate the truth of an expression by comparing two values.
+ *
+ * An <code>Operator</code> can, and will, be commonly parsed from a string expression via {@link Operator.parse}.
  */
 class Operator {
 
   /**
-   * TODO: Document
+   * Parses the specified <code>value</code> as an operator expression (i.e. the first section of a filter expression).
    *
-   * @param {string} value -
-   * @return {Operator}
-   * @throws {Error}
+   * Operator expressions should contain only the name (e.g. <code>"gte"</code>) or an alias (e.g. <code>">="</code>) of
+   * a predefined operator.
+   *
+   * An error will be thrown if <code>value</code> is invalid.
+   *
+   * @param {string} value - the string to be parsed as an operator expression
+   * @return {Operator} The {@link Operator} parsed from <code>value</code>.
+   * @throws {Error} If <code>value</code> is not a valid operator expression.
    * @public
    */
   static parse(value) {
@@ -66,11 +73,18 @@ class Operator {
   }
 
   /**
-   * TODO: Document
+   * Creates an instance of {@link Operator} with the <code>name</code>, <code>aliases</code>, and
+   * <code>evaluator</code> provided.
    *
-   * @param {string} name -
-   * @param {string[]} aliases -
-   * @param {Operator~Evaluator} evaluator -
+   * <code>name</code> is used as the primary string representation for the {@link Operator}, however, it is used in
+   * conjunction with <code>aliases</code> when it is being looked up using {@link Operator.parse}.
+   *
+   * <code>evaluator</code> is the function that will be invoked with both operands in order to make a logical
+   * comparison.
+   *
+   * @param {string} name - the name to be used
+   * @param {string[]} aliases - the aliases to be used
+   * @param {Operator~Evaluator} evaluator - the evaluator to be used
    * @protected
    */
   constructor(name, aliases, evaluator) {
@@ -80,11 +94,11 @@ class Operator {
   }
 
   /**
-   * TODO: Document
+   * Evaluates this logical {@link Operator} using the values provided.
    *
-   * @param {*} lhs -
-   * @param {*} rhs -
-   * @return {boolean}
+   * @param {*} lhs - the left-hand side operand
+   * @param {*} rhs - the right-hand side operand
+   * @return {boolean} The logical comparison for <code>lhs</code> and <code>rhs</code>.
    * @public
    */
   evaluate(lhs, rhs) {
@@ -100,9 +114,9 @@ class Operator {
   }
 
   /**
-   * TODO: Document
+   * Returns the name for this {@link Operator}.
    *
-   * @return {string}
+   * @return {string} The name.
    * @public
    */
   get name() {
@@ -111,11 +125,64 @@ class Operator {
 
 }
 
+/**
+ * The "equals" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.EQUALS = new Operator('eq', [ '=', '==', '===' ], (lhs, rhs) => lhs === rhs);
+
+/**
+ * The "greater than" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.GREATER_THAN = new Operator('gt', [ '>' ], (lhs, rhs) => lhs > rhs);
+
+/**
+ * The "greater than or equal to" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.GREATER_THAN_OR_EQUAL_TO = new Operator('gte', [ '>=' ], (lhs, rhs) => lhs >= rhs);
+
+/**
+ * The "less than" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.LESS_THAN = new Operator('lt', [ '<' ], (lhs, rhs) => lhs < rhs);
+
+/**
+ * The "less than or equal to" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.LESS_THAN_OR_EQUAL_TO = new Operator('lte', [ '<=' ], (lhs, rhs) => lhs <= rhs);
+
+/**
+ * The "not equals" operator.
+ *
+ * @public
+ * @static
+ * @type {Operator}
+ * @memberof Operator
+ */
 Operator.NOT_EQUALS = new Operator('ne', [ '!', '!=', '!==' ], (lhs, rhs) => lhs !== rhs);
 
 Operator[_operators] = [
@@ -130,10 +197,12 @@ Operator[_operators] = [
 module.exports = Operator;
 
 /**
- * TODO: Document
+ * A function which is called by {@link Operator} to evaluate the logical comparison of two values.
+ *
+ * This function is called internally by {@link Operator#evaluate}.
  *
  * @callback Operator~Evaluator
- * @param {*} lhs -
- * @param {*} rhs -
- * @return {boolean}
+ * @param {*} lhs - the left-hand side operand
+ * @param {*} rhs - the right-hand side operand
+ * @return {boolean} The logical comparison for <code>lhs</code> and <code>rhs</code>.
  */
