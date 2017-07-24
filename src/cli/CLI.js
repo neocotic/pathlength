@@ -39,12 +39,18 @@ const _errorStream = Symbol('errorStream');
 const _outputStream = Symbol('outputStream');
 
 /**
- * TODO: Document
+ * The command-line interface for {@link PathLength}.
+ *
+ * While technically part of the API, this is not expected to be used outside of this package as it's only intended use
+ * is by <code>bin/pathlength</code>.
  */
 class CLI {
 
   /**
-   * TODO: Document
+   * Creates an instance of {@link CLI} using the <code>options</code> provided.
+   *
+   * <code>options</code> is primarily intended for testing purposes and it's not expected to be supplied in any
+   * real-world scenario.
    *
    * @param {CLI~Options} [options] - the options to be used
    * @public
@@ -71,7 +77,7 @@ class CLI {
   }
 
   /**
-   * TODO: Document
+   * Parses the command-line (process) arguments provided and performs the necessary actions based on the parsed input.
    *
    * @param {string[]} [args] - the arguments to be parsed
    * @return {void}
