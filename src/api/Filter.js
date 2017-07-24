@@ -30,16 +30,23 @@ const _operand = Symbol('operand');
 const _operator = Symbol('operator');
 
 /**
- * TODO: Document
+ * Can be used to filter which check paths are included in the results of {@link PathLength#check}.
+ *
+ * A <code>Filter</code> can, and will, be commonly parsed from a string expression via {@link Filter.parse}.
  */
 class Filter {
 
   /**
-   * TODO: Document
+   * Parses the specified <code>value</code> as a filter expression.
    *
-   * @param {string} value -
-   * @return {Filter}
-   * @throws {Error}
+   * Filter expressions are made up of an {@link Operator} (e.g. <code>"gte"</code>, <code>">="</code>) and an operand
+   * (i.e. path length comparable), optionally separated by white space.
+   *
+   * An error will be thrown if any part of <code>value</code> is invalid.
+   *
+   * @param {string} value - the string to be parsed as a filter expression
+   * @return {Filter} The {@link Filter} parsed from <code>value</code>.
+   * @throws {Error} If <code>value</code> is not a valid filter expression.
    * @public
    */
   static parse(value) {
@@ -49,7 +56,7 @@ class Filter {
     if (!match) {
       throw new Error(`Invalid filter: ${value}`);
     }
-    const result = new Filter(match[1], parseInt(match[2], 10));
+    const result = new Filter(match[1], match[2]);
 
     debug.log('Filter "%s" parsed from "%s"', result, value);
 
@@ -57,20 +64,31 @@ class Filter {
   }
 
   /**
-   * TODO: Document
+   * Creates an instance of {@link Filter} with the <code>operator</code> and <code>operand</code> provided.
    *
-   * @param {Operator|string} operator -
-   * @param {number} operand -
-   * @throws {Error}
-   * @throws {RangeError}
+   * If <code>operator</code> is a string, it will be parsed using {@link Operator.parse}. Similarly, if
+   * <code>operand</code> is a string, it will be transformed into a number.
+   *
+   * <code>operand</code> must be a positive number.
+   *
+   * @param {Operator|string} operator - the {@link Operator} (or a string from which it is to be parsed) to be used
+   * @param {number|string} operand - the operand to be used
+   * @throws {Error} If either <code>operator</code> or <code>operand</code> are invalid.
+   * @throws {RangeError} If <code>operand</code> is negative.
    * @public
    */
   constructor(operator, operand) {
     if (typeof operator === 'string') {
       operator = Operator.parse(operator);
     }
+    if (typeof operand === 'string') {
+      operand = parseInt(operand, 10);
+    }
     if (!operator) {
       throw new Error('Operator must be specified');
+    }
+    if (typeof operand !== 'number' || Number.isNaN(operand)) {
+      throw new Error(`Operand must be a number: ${operand}`);
     }
     if (operand < 0) {
       throw new RangeError(`Operand must be positive: ${operand}`);
@@ -81,10 +99,12 @@ class Filter {
   }
 
   /**
-   * TODO: Document
+   * Checks whether this {@link Filter} passes for the specified file path.
    *
-   * @param {string} filePath -
-   * @return {boolean}
+   * This is done by evaluating the {@link Operator} using the length of <code>filePath</code> and the operand.
+   *
+   * @param {string} filePath - the file path to be checked
+   * @return {boolean} <code>true</code> if <code>filePath</code> passes the filter; otherwise <code>false</code>.
    * @public
    */
   check(filePath) {
@@ -100,9 +120,9 @@ class Filter {
   }
 
   /**
-   * TODO: Document
+   * Returns the operand for this {@link Filter}.
    *
-   * @return {string}
+   * @return {number} The operand.
    * @public
    */
   get operand() {
@@ -110,9 +130,9 @@ class Filter {
   }
 
   /**
-   * TODO: Document
+   * Returns the {@link Operator} for this {@link Filter}.
    *
-   * @return {Operator}
+   * @return {Operator} The operator.
    * @public
    */
   get operator() {
