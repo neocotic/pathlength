@@ -240,6 +240,7 @@ events that are emitted by `pathlength`.
 | `checkpath` | Fired immediately before a path is checked                                                                                |
 | `result`    | Fired immediately after a path is checked along with its findings                                                         |
 | `end`       | Fired once all paths have been scanned and checked                                                                        |
+| `error`     | Fired whenever an error occurs                                                                                            |
 
 #### Examples
 

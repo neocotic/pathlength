@@ -127,6 +127,7 @@ class PathLength extends EventEmitter {
    * @fires PathLength#check
    * @fires PathLength#checkpath
    * @fires PathLength#end
+   * @fires PathLength#error
    * @fires PathLength#result
    * @public
    */
@@ -181,6 +182,17 @@ class PathLength extends EventEmitter {
         this.emit('end', { options, results });
 
         return results;
+      })
+      .catch((error) => {
+        /**
+         * The "error" event is fired whenever an error occurs.
+         *
+         * @event PathLength#error
+         * @type {Error}
+         */
+        this.emit('error', error);
+
+        throw error;
       });
   }
 
