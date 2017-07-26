@@ -28,7 +28,17 @@ const escape = require('escape-html');
 const Style = require('./Style');
 
 /**
- * TODO: Document
+ * An implementation of {@link Style} that outputs the results as a XML document containing elements the following form:
+ *
+ * <pre>
+ * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ * &lt;results&gt;
+ *   &lt;result directory="DIRECTORY_BOOLEAN" length="LENGTH_NUMBER" path="PATH_STRING" /&gt;
+ * &lt;/results&gt;
+ * </pre>
+ *
+ * When the <code>pretty</code> option is enabled, the XML is indented and spans multiple lines (just like the example
+ * above).
  */
 class XmlStyle extends Style {
 
