@@ -30,10 +30,17 @@ const Style = require('./Style');
  * An implementation of {@link Style} that outputs the results as a JSON array containing elements the following form:
  *
  * <pre>
- * {"directory":DIRECTORY_BOOLEAN,"length":LENGTH_NUMBER,"path":"PATH_STRING"}
+ * [
+ *   {
+ *     "directory": DIRECTORY_BOOLEAN,
+ *     "length": LENGTH_NUMBER,
+ *     "path":"PATH_STRING"
+ *   }
+ * ]
  * </pre>
  *
- * When the <code>pretty</code> option is enabled, the JSON is indented and spans multiple lines.
+ * When the <code>pretty</code> option is enabled, the JSON is indented and spans multiple lines (just like the example
+ * above).
  */
 class JsonStyle extends Style {
 
