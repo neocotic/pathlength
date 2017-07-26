@@ -25,6 +25,7 @@
 require('./style/CsvStyle');
 require('./style/JsonStyle');
 require('./style/PlainStyle');
+require('./style/TableStyle');
 require('./style/XmlStyle');
 
 const CLI = require('./CLI');
