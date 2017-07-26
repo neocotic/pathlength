@@ -33,7 +33,19 @@ const _outputHeaders = Symbol('outputHeaders');
 const _outputRow = Symbol('outputRow');
 
 /**
- * TODO: Document
+ * An implementation of {@link Style} that outputs the results in a table containing rows of elements in the following
+ * form:
+ *
+ * <pre>
+ * +-------------+---------------+------------------+
+ * | Path        | Length        | Type             |
+ * +-------------+---------------+------------------+
+ * | PATH_STRING | LENGTH_NUMBER | FILE_TYPE_STRING |
+ * +-------------+---------------+------------------+
+ * </pre>
+ *
+ * When the <code>pretty</code> option is enabled, the column cells are padded so that they all share the same width
+ * (just like the example above), however, nothing is written to the output stream until all results are in.
  */
 class TableStyle extends Style {
 
@@ -145,18 +157,19 @@ Style.register(TableStyle);
 module.exports = TableStyle;
 
 /**
- * TODO: Document
+ * Defines a column for the table and how its data is presented.
  *
  * @typedef {Object} TableStyle~Column
- * @property {string} header -
- * @property {number} maxWidth -
- * @property {TableStyle~ColumnRenderer} render -
+ * @property {string} header - The text to be displayed in the column header.
+ * @property {number} maxWidth - The maximum width of this column. Will be zero unless the <code>pretty</code> option is
+ * enabled and the "end" event has been fired by the {@link PathLength} instance.
+ * @property {TableStyle~ColumnRenderer} render - The column cell renderer.
  */
 
 /**
- * TODO: Document
+ * A function which is called by {@link TableStyle} to render the text to be displayed in the column cell.
  *
  * @callback TableStyle~ColumnRenderer
- * @param {PathLength~Result} result -
- * @return {string}
+ * @param {PathLength~Result} result - The result to be rendered.
+ * @return {string} The cell text for <code>result</code>.
  */
