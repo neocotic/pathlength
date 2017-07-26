@@ -36,7 +36,8 @@ const Style = require('./Style');
  *   path: PATH_STRING
  * </pre>
  *
- * The <code>pretty</code> option is ignored by <code>YamlStyle</code>.
+ * When the <code>pretty</code> option is enabled, the YAML is indented and spans multiple lines (just like the example
+ * above).
  */
 class YamlStyle extends Style {
 
@@ -45,17 +46,45 @@ class YamlStyle extends Style {
    * @inheritDoc
    */
   apply(options) {
+    let count = 0;
     const outputStream = options.outputStream;
     const pathLength = options.pathLength;
+    const pretty = options.pretty;
     const yamlOptions = {
       lineWidth: -1,
-      noRefs: true
+      noRefs: true,
+      sortKeys: true
     };
 
-    pathLength.on('result', (event) => {
-      outputStream.write(`${yaml.safeDump([ event ], yamlOptions).replace(/\r\n?|\n/g, EOL)}`);
+    if (!pretty) {
+      yamlOptions.flowLevel = 0;
+    }
+
+    pathLength.on('check', () => {
+      if (!pretty) {
+        outputStream.write('[');
+      }
     });
-    pathLength.on('end', () => outputStream.write(EOL));
+    pathLength.on('result', (event) => {
+      if (count && !pretty) {
+        outputStream.write(', ');
+      }
+
+      count++;
+
+      if (pretty) {
+        outputStream.write(yaml.safeDump([ event ], yamlOptions).replace(/\r\n?|\n/g, EOL));
+      } else {
+        outputStream.write(yaml.safeDump(event, yamlOptions).replace(/\r\n?|\n/g, ''));
+      }
+    });
+    pathLength.on('end', () => {
+      if (!pretty) {
+        outputStream.write(']');
+      }
+
+      outputStream.write(EOL);
+    });
   }
 
   /**
