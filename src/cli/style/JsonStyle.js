@@ -53,11 +53,7 @@ class JsonStyle extends Style {
       count++;
 
       if (pretty) {
-        outputStream.write(`  {${EOL}`);
-        outputStream.write(`    "directory": ${JSON.stringify(event.directory)},${EOL}`);
-        outputStream.write(`    "length": ${JSON.stringify(event.length)},${EOL}`);
-        outputStream.write(`    "path": ${JSON.stringify(event.path)}${EOL}`);
-        outputStream.write('  }');
+        outputStream.write(`  ${JSON.stringify(event, null, 2).replace(/\n/gm, '\n  ')}`);
       } else {
         outputStream.write(JSON.stringify(event));
       }
