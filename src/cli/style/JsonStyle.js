@@ -59,7 +59,7 @@ class JsonStyle extends Style {
       count++;
 
       if (pretty) {
-        outputStream.write(`  ${JSON.stringify(event, null, 2).replace(/\n/gm, '\n  ')}`);
+        outputStream.write(`  ${JSON.stringify(event, null, 2).replace(/\r\n?|\n/g, `${EOL}  `)}`);
       } else {
         outputStream.write(JSON.stringify(event));
       }

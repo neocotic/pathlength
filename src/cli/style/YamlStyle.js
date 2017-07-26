@@ -52,7 +52,9 @@ class YamlStyle extends Style {
       noRefs: true
     };
 
-    pathLength.on('result', (event) => outputStream.write(`${yaml.safeDump([ event ], yamlOptions)}`));
+    pathLength.on('result', (event) => {
+      outputStream.write(`${yaml.safeDump([ event ], yamlOptions).replace(/\r\n?|\n/g, EOL)}`);
+    });
     pathLength.on('end', () => outputStream.write(EOL));
   }
 
