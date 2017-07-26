@@ -52,6 +52,8 @@ class Filter {
   static parse(value) {
     debug.log('Attempting to parse filter from "%s"', value);
 
+    value = value.trim();
+
     const match = value.match(/^([^\d\s]+)\s*(\d+)$/);
     if (!match) {
       throw new Error(`Invalid filter: ${value}`);

@@ -52,6 +52,8 @@ class Operator {
   static parse(value) {
     debug.log('Attempting to parse operator from "%s"', value);
 
+    value = value.trim();
+
     let result;
 
     for (const key of Operator[_operators]) {
