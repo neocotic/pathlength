@@ -28,15 +28,6 @@ const Style = require('./Style');
 
 /**
  * TODO: Document
- *
- * An implementation of {@link Style} that outputs each result on a line containing comma-separated values in the
- * following form:
- *
- * <pre>
- * "PATH_STRING","LENGTH_NUMBER","DIRECTORY_BOOLEAN"
- * </pre>
- *
- * The <code>pretty</code> option is ignored by <code>CsvStyle</code>.
  */
 class JsonStyle extends Style {
 
@@ -62,7 +53,11 @@ class JsonStyle extends Style {
       count++;
 
       if (pretty) {
-        outputStream.write(`  ${JSON.stringify(event, null, 4).replace(/\n}/m, '\n  }')}`);
+        outputStream.write(`  {${EOL}`);
+        outputStream.write(`    "directory": ${JSON.stringify(event.directory)},${EOL}`);
+        outputStream.write(`    "length": ${JSON.stringify(event.length)},${EOL}`);
+        outputStream.write(`    "path": ${JSON.stringify(event.path)}${EOL}`);
+        outputStream.write('  }');
       } else {
         outputStream.write(JSON.stringify(event));
       }

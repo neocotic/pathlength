@@ -27,14 +27,7 @@ const EOL = require('os').EOL;
 const Style = require('./Style');
 
 /**
- * An implementation of {@link Style} that outputs each result on a line containing comma-separated values in the
- * following form:
- *
- * <pre>
- * "PATH_STRING","LENGTH_NUMBER","DIRECTORY_BOOLEAN"
- * </pre>
- *
- * The <code>pretty</code> option is ignored by <code>CsvStyle</code>.
+ * TODO: Document
  */
 class CsvStyle extends Style {
 
