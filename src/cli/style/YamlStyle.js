@@ -22,13 +22,42 @@
 
 'use strict';
 
-require('./style/CsvStyle');
-require('./style/JsonStyle');
-require('./style/PlainStyle');
-require('./style/TableStyle');
-require('./style/XmlStyle');
-require('./style/YamlStyle');
+const EOL = require('os').EOL;
+const yaml = require('js-yaml');
 
-const CLI = require('./CLI');
+const Style = require('./Style');
 
-module.exports = new CLI();
+/**
+ * TODO: Document
+ */
+class YamlStyle extends Style {
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  apply(options) {
+    const outputStream = options.outputStream;
+    const pathLength = options.pathLength;
+    const yamlOptions = {
+      lineWidth: -1,
+      noRefs: true
+    };
+
+    pathLength.on('result', (event) => outputStream.write(`${yaml.safeDump([ event ], yamlOptions)}`));
+    pathLength.on('end', () => outputStream.write(EOL));
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  getName() {
+    return 'yaml';
+  }
+
+}
+
+Style.register(YamlStyle);
+
+module.exports = YamlStyle;

@@ -28,6 +28,7 @@
     "debug": "^2.6.8",
     "debugged": "^0.1.0",
     "escape-html": "^1.0.3",
+    "js-yaml": "^3.9.0",
     "pollock": "^0.1.0",
     "right-pad": "^1.0.1"
   },
