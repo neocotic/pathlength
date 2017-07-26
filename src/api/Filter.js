@@ -54,7 +54,7 @@ class Filter {
 
     value = value.trim();
 
-    const match = value.match(/^([^\d\s]+)\s*(\d+)$/);
+    const match = value.match(/^([^1-9\s]+)\s*([1-9]\d*)$/);
     if (!match) {
       throw new Error(`Invalid filter: ${value}`);
     }
