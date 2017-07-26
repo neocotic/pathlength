@@ -27,7 +27,13 @@ const EOL = require('os').EOL;
 const Style = require('./Style');
 
 /**
- * TODO: Document
+ * The default implementation of {@link Style} that outputs each result on a line in the following plain form:
+ *
+ * <pre>
+ * PATH_STRING [LENGTH_NUMBER, FILE_TYPE_STRING]
+ * </pre>
+ *
+ * The <code>pretty</code> option is ignored by <code>PlainStyle</code>.
  */
 class PlainStyle extends Style {
 
