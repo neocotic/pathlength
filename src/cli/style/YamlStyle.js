@@ -31,9 +31,9 @@ const Style = require('./Style');
  * An implementation of {@link Style} that outputs the results as a YAML array containing elements the following form:
  *
  * <pre>
- * directory: DIRECTORY_BOOLEAN
- * length: LENGTH_NUMBER
- * path: PATH_STRING
+ * - directory: DIRECTORY_BOOLEAN
+ *   length: LENGTH_NUMBER
+ *   path: PATH_STRING
  * </pre>
  *
  * The <code>pretty</code> option is ignored by <code>YamlStyle</code>.
