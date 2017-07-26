@@ -1,355 +1,314 @@
-                    __    __      ___                          __    __         
-                   /\ \__/\ \    /\_ \                        /\ \__/\ \        
-     _____     __  \ \ ,_\ \ \___\//\ \      __    ___      __\ \ ,_\ \ \___    
-    /\ '__`\ /'__`\ \ \ \/\ \  _ `\\ \ \   /'__`\/' _ `\  /'_ `\ \ \/\ \  _ `\  
-    \ \ \L\ \\ \L\.\_\ \ \_\ \ \ \ \\_\ \_/\  __//\ \/\ \/\ \L\ \ \ \_\ \ \ \ \ 
-     \ \ ,__/ \__/.\_\\ \__\\ \_\ \_\\____\ \____\ \_\ \_\ \____ \ \__\\ \_\ \_\
-      \ \ \/ \/__/\/_/ \/__/ \/_/\/_//____/\/____/\/_/\/_/\/___L\ \/__/ \/_/\/_/
-       \ \_\                                                /\____/             
-        \/_/                                                \_/__/              
+    8888888b.          888    888
+    888   Y88b         888    888
+    888    888         888    888
+    888   d88P 8888b.  888888 88888b.
+    8888888P"     "88b 888    888 "88b
+    888       .d888888 888    888  888
+    888       888  888 Y88b.  888  888
+    888       "Y888888  "Y888 888  888
+       888                                888    888
+       888                                888    888
+       888                                888    888
+       888      .d88b.  88888b.   .d88b.  888888 88888b.
+       888     d8P  Y8b 888 "88b d88P"88b 888    888 "88b
+       888     88888888 888  888 888  888 888    888  888
+       888     Y8b.     888  888 Y88b 888 Y88b.  888  888
+       88888888 "Y8888  888  888  "Y88888  "Y888 888  888
+                                      888
+                                 Y8b d88P
+                                  "Y88P"
 
-[pathlength][] is a simple file path length checker for [node.js][].
+[PathLength](https://github.com/neocotic/pathlength) is a [Node.js](https://nodejs.org) module for checking the lengths
+of file paths.
 
-[![Build Status](https://secure.travis-ci.org/neocotic/pathlength.png)](http://travis-ci.org/neocotic/pathlength)
+[![Build Status](https://img.shields.io/travis/neocotic/pathlength/develop.svg?style=flat-square)](https://travis-ci.org/neocotic/pathlength)
+[![Dependency Status](https://img.shields.io/david/neocotic/pathlength.svg?style=flat-square)](https://david-dm.org/neocotic/pathlength)
+[![Dev Dependency Status](https://img.shields.io/david/dev/neocotic/pathlength.svg?style=flat-square)](https://david-dm.org/neocotic/pathlength?type=dev)
+[![License](https://img.shields.io/npm/l/pathlength.svg?style=flat-square)](https://github.com/neocotic/pathlength/blob/master/LICENSE.md)
+[![Release](https://img.shields.io/npm/v/pathlength.svg?style=flat-square)](https://www.npmjs.com/package/pathlength)
+
+* [Install](#install)
+* [CLI](#cli)
+* [API](#api)
+* [Filters](#filters)
+* [Bugs](#bugs)
+* [Contributors](#contributors)
+* [License](#license)
 
 ## Install
 
-Install from [npm][]:
+Install using `npm`:
 
 ``` bash
-$ npm install pathlength
+$ npm install --save pathlength
 ```
 
-## Usage
+You'll need to have at least [Node.js](https://nodejs.org) 4 or newer.
 
-    Usage: pathlength [options] [target]
+If you want to use the command line interface, which you probably do, you'll most likely want to install it globally so
+that you can run `pathlength` from anywhere:
 
+``` bash
+$ npm install --global pathlength
+```
+
+## CLI
+
+    Usage: pathlength [options] [file]
+    
+    
     Options:
-
-      -h, --help                 output usage information
+    
       -V, --version              output the version number
-      -d, --debug                output debug messages
-      -f, --filter [expression]  filter expression to use
-      -n, --no-headers           don't output headers for certain formats
-      -o, --output [format]      format for output
-      -p, --progressive          output matches as they are found
-      -r, --recursive            check directories recursively
-      -s, --stop                 don't search unfiltered directories
+      -d, --debug                enable debug level logging
+      -f, --filter <expression>  filter paths by length
+      -F, --force                ignore errors for individual path checks
+      -l, --limit <max>          limit number of results
+      -p, --pretty               enable pretty formatting for supporting styles
+      -r, --recursive            search directories recursively
+      --stack                    print stack traces for errors
+      -s, --style <name>         use style for output
+      -h, --help                 output usage information
 
-### Examples
+The command line interface is the primary intended use for PathLength and it's designed to be extremely simple and works
+on an opt-in principle.
 
-Recursively check for all files within a `Temp` directory with a path longer
-than 255 characters:
+### Styles
 
-``` bash
-$ pathlength -rf ">255" ~/Temp
-```
+As mentioned above, the CLI accepts a `style` option which, when specified, changes how the results are presented.
 
-Check for paths length longer than that of the target file/directory:
+The `pretty` option can also be used to instruct styles to make present themselves *prettier*, however, this option is
+not supported by all styles, only those where it makes sense.
 
-``` bash
-$ pathlength -rf ">@" ~/Temp
-```
+#### plain
 
-Format the result output as a padded table with headers:
+This is the default style and outputs results in a plain format.
 
-``` bash
-$ pathlength -ro table -f ">@" ~/Temp
-```
+    $ pathlength src
+    /home/neocotic/dev/pathlength/src [33, directory]
+    /home/neocotic/dev/pathlength/src/api [37, directory]
+    /home/neocotic/dev/pathlength/src/cli [37, directory]
+    /home/neocotic/dev/pathlength/src/index.js [42, file]
 
-Output:
+The `pretty` option is ignored by this style.
 
-    Path                             Length Type      
-    /Users/neocotic/Temp/bar.txt     28     File      
-    /Users/neocotic/Temp/foo.txt     28     File      
-    /Users/neocotic/Temp/sub         24     Directory 
-    /Users/neocotic/Temp/sub/baz.txt 32     File      
-    /Users/neocotic/Temp/sub/fu.txt  31     File      
+#### csv
 
-Output the results of the search as they are found:
+This style outputs each result as comma-separated values.
 
-``` bash
-$ pathlength -rpf ">@" ~/Temp
-```
+    $ pathlength -s csv src
+    "/home/neocotic/dev/pathlength/src","33","true"
+    "/home/neocotic/dev/pathlength/src/api","37","true"
+    "/home/neocotic/dev/pathlength/src/cli","37","true"
+    "/home/neocotic/dev/pathlength/src/index.js","42","false"
 
-## Formats
+The `pretty` option is ignored by this style.
 
-``` bash
-$ pathlength -o $FORMAT ~/Temp
-```
+#### json
 
-### Simple (default)
+This style outputs the results as a JSON array.
 
-Names: `simple` `s`
+    $ pathlength -s json src
+    [{"directory":true,"length":33,"path":"/home/neocotic/dev/pathlength/src"},{"directory":true,"length":37,"path":"/home/neocotic/dev/pathlength/src/api"},{"directory":true,"length":37,"path":"/home/neocotic/dev/pathlength/src/cli"},{"directory":false,"length":42,"path":"/home/neocotic/dev/pathlength/src/index.js"}]
 
-Example:
+The `pretty` option will format the JSON nicely with good spacing, indentation, and spans multiple lines.
 
-    /Users/neocotic/Temp:20
+    $ pathlength -ps json src
+    [
+      {
+        "directory": true,
+        "length": 33,
+        "path": "/home/neocotic/dev/pathlength/src"
+      },
+      {
+        "directory": true,
+        "length": 37,
+        "path": "/home/neocotic/dev/pathlength/src/api"
+      },
+      {
+        "directory": true,
+        "length": 37,
+        "path": "/home/neocotic/dev/pathlength/src/cli"
+      },
+      {
+        "directory": false,
+        "length": 42,
+        "path": "/home/neocotic/dev/pathlength/src/index.js"
+      }
+    ]
 
-### Comma-separated values
+#### table
 
-Names: `csv` `c`
+This style outputs the results as a table.
 
-Example:
+    $ pathlength -s table src
+    +------+--------+------+
+    | Path | Length | Type |
+    +------+--------+------+
+    | /home/neocotic/dev/pathlength/src | 33 | Directory |
+    | /home/neocotic/dev/pathlength/src/api | 37 | Directory |
+    | /home/neocotic/dev/pathlength/src/cli | 37 | Directory |
+    | /home/neocotic/dev/pathlength/src/index.js | 42 | File |
+    +------+--------+------+
 
-    "/Users/neocotic/Temp","20","Directory"
+The `pretty` option will format the table nicely with padded cells for aligned columns.
 
-### JSON
+    $ pathlength -ps table src
+    +--------------------------------------------+--------+-----------+
+    | Path                                       | Length | Type      |
+    +--------------------------------------------+--------+-----------+
+    | /home/neocotic/dev/pathlength/src          | 33     | Directory |
+    | /home/neocotic/dev/pathlength/src/api      | 37     | Directory |
+    | /home/neocotic/dev/pathlength/src/cli      | 37     | Directory |
+    | /home/neocotic/dev/pathlength/src/index.js | 42     | File      |
+    +--------------------------------------------+--------+-----------+
 
-Names: `json` `j`
+However, using the `pretty` option with this style does mean that nothing is written to the output stream until all
+results are in. This is because the maximum column width cannot be calculated until all of the data is available.
 
-Example:
+#### xml
 
-``` javascript
-[
-  {
-    "path": "/Users/neocotic/Temp",
-    "length": 20,
-    "type": "Directory"
-  }
-]
-```
+This style outputs the results as a XML document.
 
-### Table
+    $ pathlength -s xml src
+    <?xml version="1.0" encoding="UTF-8" ?><results><result directory="true" length="33" path="/home/neocotic/dev/pathlength/src" /><result directory="true" length="37" path="/home/neocotic/dev/pathlength/src/api" /><result directory="true" length="37" path="/home/neocotic/dev/pathlength/src/cli" /><result directory="false" length="42" path="/home/neocotic/dev/pathlength/src/index.js" /></results>
 
-Names: `table` `t`
+The `pretty` option will format the XML nicely with good indentation and spans multiple lines.
 
-Notes:
+    $ pathlength -ps xml src
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <results>
+      <result directory="true" length="33" path="/home/neocotic/dev/pathlength/src" />
+      <result directory="true" length="37" path="/home/neocotic/dev/pathlength/src/api" />
+      <result directory="true" length="37" path="/home/neocotic/dev/pathlength/src/cli" />
+      <result directory="false" length="42" path="/home/neocotic/dev/pathlength/src/index.js" />
+    </results>
 
-* Includes headers unless the `-n|--no-headers` option is used
-* Columns are not padding when running in progressive mode
+#### yaml
 
-Example:
+This style outputs the results as a YAML array.
 
-    Path                 Length Type
-    /Users/neocotic/Temp 20     Directory
+    $ pathlength -s yaml src
+    [{directory: true, length: 33, path: /home/neocotic/dev/pathlength/src}, {directory: true, length: 37, path: /home/neocotic/dev/pathlength/src/api}, {directory: true, length: 37, path: /home/neocotic/dev/pathlength/src/cli}, {directory: false, length: 42, path: /home/neocotic/dev/pathlength/src/index.js}]
 
-### XML
+The `pretty` option will format the YAML nicely with good indentation and spans multiple lines.
 
-Names: `xml` `x`
+    $ pathlength -ps yaml src
+    - directory: true
+      length: 33
+      path: /home/neocotic/dev/pathlength/src
+    - directory: true
+      length: 37
+      path: /home/neocotic/dev/pathlength/src/api
+    - directory: true
+      length: 37
+      path: /home/neocotic/dev/pathlength/src/cli
+    - directory: false
+      length: 42
+      path: /home/neocotic/dev/pathlength/src/index.js
 
-Example:
+## API
 
-``` xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<results>
-  <result path="/Users/neocotic/Temp" length="20" type="Directory" />
-</results>
-```
+While most of you will be using PathLength via its CLI, the API can also be used and is designed to be just as simple to
+use. It uses ECMAScript 2015's promises to handle the asynchronous flow:
 
-## Programmatically
+It's best to take a look at the code and or inspect the results yourself to see all of the information available.
 
-`find([options][, callback])` is used primarily:
+### `check([options])`
 
-``` javascript
-var pathlength = require('pathlength')
+Scans files and directories within the current working directory and checks the length of their real path using the
+`options` provided.
 
-pathlength.find(
-    {
-        filter:    ['lte', '255']
-      , recursive: true
-      , target:    '~/Temp'
-    }
-  , function (err, dataSet) {
-      if (err) throw err
-      // Process data set...
-    }
-)
-```
+This method returns a `Promise` that is resolved with all results. However, progress can be monitored by listening to
+events that are emitted by `pathlength`.
 
-### Options
+#### Options
 
-The following options are recognised by this method (all of which are
-optional);
+| Option      | Description                                                                                                | Default         |
+| ----------- | ---------------------------------------------------------------------------------------------------------- | --------------- |
+| `cwd`       | Directory from which to begin scanning paths                                                               | `process.cwd()` |
+| `filter`    | `Filter` (or filter expression to be parsed) to be used to control which paths are included in the results | *All*           |
+| `force`     | Enable to ignore errors for individual path checks                                                         | `false`         |
+| `limit`     | Maximum number of results (unlimited if negative)                                                          | *Unlimited*     |
+| `recursive` | Search for paths recursively within `cwd`                                                                  | `false`         |
 
-<table>
-  <tr>
-    <th>Property</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>context</td>
-    <td>Context in which to call the callback function</td>
-  </tr>
-  <tr>
-    <td>filter</td>
-    <td>Filter expression used to check files/directories</td>
-  </tr>
-  <tr>
-    <td>recursive</td>
-    <td>Check directories recursively</td>
-  </tr>
-  <tr>
-    <td>stop</td>
-    <td>Don't check children of unfiltered directories</td>
-  </tr>
-  <tr>
-    <td>target</td>
-    <td>Target file/directory to check</td>
-  </tr>
-</table>
+#### Events
 
-### Events
+| Event       | Description                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `check`     | Fired once the options have been derived and the filter, if any, been parsed but before any paths are scanned and checked |
+| `checkpath` | Fired immediately before a path is checked                                                                                |
+| `result`    | Fired immediately after a path is checked along with its findings                                                         |
+| `end`       | Fired once all paths have been scanned and checked                                                                        |
 
-Get notified whenever a matching file/directory has been found:
-
-``` javascript
-var pathlength = require('pathlength')
-
-pathlength.on('data', function (data) {
-  // Process data...
-})
-pathlength.find({
-    filter:    'gt @'
-  , recursive: true
-  , target:    '~/Temp'
-})
-```
-
-The following events can be triggered by this method;
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Called...</th>
-  </tr>
-  <tr>
-    <td>start</td>
-    <td>...after handling all arguments</td>
-  </tr>
-  <tr>
-    <td>afterStart</td>
-    <td>...before the first <em>beforeData</em> event</td>
-  </tr>
-  <tr>
-    <td>betweenData</td>
-    <td>...before all other <em>beforeData</em> events</td>
-  </tr>
-  <tr>
-    <td>beforeData</td>
-    <td>...before all <em>data</em> events (<code>data</code> argument passed to handlers)</td>
-  </tr>
-  <tr>
-    <td>data</td>
-    <td>...when the result has been stored in the data set (<code>data</code> argument passed to handlers)</td>
-  </tr>
-  <tr>
-    <td>afterData</td>
-    <td>...after all <em>data</em> events (<code>data</code> argument passed to handlers)</td>
-  </tr>
-  <tr>
-    <td>beforeEnd</td>
-    <td>...after the last <em>afterData</em> event (<code>dataSet</code> argument passed to handlers)</td>
-  </tr>
-  <tr>
-    <td>end</td>
-    <td>...in parallel with the callback function (<code>dataSet</code> argument passed to handlers)</td>
-  </tr>
-</table>
-
-### Properties
+#### Examples
 
 ``` javascript
-pathlength.on('end', function (dataSet) {
-  dataSet.forEach(function (data) {
-    console.log(data.path)      // e.g. /Users/neocotic/Temp
-    console.log(data.length)    // e.g. 20
-    console.log(data.directory) // e.g. true
-  })
-})
+pathlength.check({ cwd: '/', filter: '>255', force: true, recursive: true })
+  .then((results) => {
+    console.log(`${results.length} paths found that are longer than 255 characters`);
+  });
 ```
 
 ## Filters
 
-Filters simply consist of a comparison operator followed by an operand.
+While using the CLI, you'll always be using filter expressions; strings that are parsed into filter objects. This will
+be common for the API as well as it's much easier and cleaner to read.
 
-A wildcard (`*`) character replaces any invalid filter component(s), which will
-result in all files and directories being included in the results.
+A filter consists of a logical operator followed by an operand that is evaluated against the length of each path. The
+operand can only consist of positive numerical value. The parser for filter expressions is quite strict and will throw
+an error if it doesn't match the expected pattern. Any leading, trailing, or separating whitespace is ignored by the
+parser.
 
-<table>
-  <tr>
-    <th>Operators</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>
-      <code>!</code>
-      <code>!=</code>
-      <code>ne</code>
-    </td>
-    <td>Not equal to</td>
-  </tr>
-  <tr>
-    <td>
-      <code>=</code>
-      <code>==</code>
-      <code>eq</code>
-    </td>
-    <td>Equal to</td>
-  </tr>
-  <tr>
-    <td>
-      <code>&gt;</code>
-      <code>gt</code>
-    </td>
-    <td>Greater than</td>
-  </tr>
-  <tr>
-    <td>
-      <code>&gt;=</code>
-      <code>gte</code>
-    </td>
-    <td>Greater than or equal to</td>
-  </tr>
-  <tr>
-    <td>
-      <code>&lt;</code>
-      <code>lt</code>
-    </td>
-    <td>Less than</td>
-  </tr>
-  <tr>
-    <td>
-      <code>&lt;=</code>
-      <code>lte</code>
-    </td>
-    <td>Less than or equal to</td>
-  </tr>
-</table>
+The following operators are supported and each can be imported directly via the API exposed by `src/api/Operator`, if
+needed. 
 
-Operands can consist of numeric characters or one of the following special
-characters, which are replaced with their corresponding value:
+| Operator | Aliases        | API                        | Description              |
+| -------- | -------------- | -------------------------- | ------------------------ |
+| `eq`     | `=` `==` `===` | `EQUALS`                   | Equal to                 |
+| `ne`     | `!` `!=` `!==` | `NOT_EQUALS`               | Not equal to             |
+| `gt`     | `>`            | `GREATER_THAN`             | Greater than             |
+| `gte`    | `>=`           | `GREATER_THAN_OR_EQUAL_TO` | Greater than or equal to |
+| `lt`     | `<`            | `LESS_THAN`                | Less than                |
+| `lte`    | `<=`           | `LESS_THAN_OR_EQUAL_TO`    | Less than or equal to    |
 
-<table>
-  <tr>
-    <th>Character</th>
-    <th>Value</th>
-  </tr>
-  <tr>
-    <td><code>@</code></td>
-    <td>Length of the target file/directory</td>
-  </tr>
-</table>
+When using filter expressions the operator can be represented either by its name (e.g. `eq`) or any of its aliases (e.g.
+`==`). 
+
+For example; the filter expression `">255"` will only match paths whose length is greater than 255 characters.
+
+The API also allows `Filter` instances - which are also the result of parsing filter expressions - to be passed as the
+`filter` option. This can be useful if your code will be calling `check` with the same filter multiple times as it can
+avoid unnecessary parsing.
+
+You can construct the `Filter` yourself or use `Filter.parse` to create an instance parsed from a filter expression:
+
+``` javascript
+const pathlength = require('pathlength');
+const Filter = require('pathlength/src/api/Filter');
+const Operator = require('pathlength/src/api/Operator');
+
+// The following are equivalents
+pathlength.check({ filter: new Filter(Operator.GREATER_THAN, 255) }).then((results) => ...);
+pathlength.check({ filter: new Filter('>', 255) }).then((results) => ...);
+pathlength.check({ filter: Filter.parse('>255') }).then((results) => ...);
+pathlength.check({ filter: '>255' }).then((results) => ...);
+```
 
 ## Bugs
 
-If you have any problems with this library or would like to see the changes currently in
-development you can do so here;
+If you have any problems with PathLength or would like to see changes currently in development you can do so
+[here](https://github.com/neocotic/pathlength/issues).
 
-https://github.com/neocotic/pathlength/issues
+## Contributors
 
-## Questions?
+If you want to contribute, you're a legend! Information on how you can do so can be found in
+[CONTRIBUTING.md](https://github.com/neocotic/pathlength/blob/master/CONTRIBUTING.md). We want your suggestions and pull
+requests!
 
-Take a look at the code to get a better understanding of what it's doing.
+A list of PathLength contributors can be found in
+[AUTHORS.md](https://github.com/neocotic/pathlength/blob/master/AUTHORS.md).
 
-If that doesn't help, feel free to follow me on Twitter, [@neocotic][].
+## License
 
-However, if you want more information or examples of using this library please visit the project's
-homepage;
-
-http://neocotic.com/pathlength
-
-[@neocotic]: https://twitter.com/neocotic
-[node.js]: http://nodejs.org
-[npm]: http://npmjs.org
-[pathlength]: http://neocotic.com/pathlength
+See [LICENSE.md](https://github.com/neocotic/pathlength/raw/master/LICENSE.md) for more information on our MIT license.
