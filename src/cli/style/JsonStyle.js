@@ -27,7 +27,13 @@ const EOL = require('os').EOL;
 const Style = require('./Style');
 
 /**
- * TODO: Document
+ * An implementation of {@link Style} that outputs the results as a JSON array containing elements the following form:
+ *
+ * <pre>
+ * {"directory":DIRECTORY_BOOLEAN,"length":LENGTH_NUMBER,"path":"PATH_STRING"}
+ * </pre>
+ *
+ * When the <code>pretty</code> option is enabled, the JSON is indented and spans multiple lines.
  */
 class JsonStyle extends Style {
 
